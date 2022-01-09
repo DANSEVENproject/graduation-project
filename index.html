@@ -206,11 +206,11 @@
             <div class="form-wrapper">
                 <form name="banner-form" id="banner-form" action="#" method="post">
                     <input type="hidden" name="form_name" value=" Записаться на визит">
-                    <input name="name" type="text" required placeholder="Ваше имя...">
-                    <input type="tel" name="phone" id="phone" required placeholder="Ваш номер телефона...">
+                    <input name="name" type="text" placeholder="Ваше имя...">
+                    <input type="tel" name="phone" id="phone" placeholder="Ваш номер телефона...">
                     <button name="send" class="btn" type="submit">Записаться</button>
                     <p class="personal-data">
-                        <input type="checkbox" required id="check1"><label for="check1">Я согласен на обработку персональных
+                        <input type="checkbox" id="check1"><label for="check1">Я согласен на обработку персональных
                     данных</label>
                     </p>
                 </form>
@@ -332,15 +332,15 @@
                     </label>
                         </div>
                         <div class="price">
-                            <div class="price-message input-text"><input type="text" class="price-message__promo" required placeholder="Промокод"></div>
+                            <div class="price-message input-text"><input type="text" class="price-message__promo" placeholder="Промокод"></div>
                             <div class="price-message">Цена:</div>
                             <div class="price-message" id="price-total">2999</div>
                         </div>
                         <input type="hidden" name="form_name" value="Заказать карту">
-                        <p class="input-text"><input name="name" type="text" required placeholder="Ваше имя..."></p>
-                        <p class="input-text"><input type="tel" name="phone" id="callback_form-phone" required placeholder="Ваш номер телефона..."></p>
+                        <p class="input-text"><input name="name" type="text" placeholder="Ваше имя..."></p>
+                        <p class="input-text"><input type="tel" name="phone" id="callback_form-phone" placeholder="Ваш номер телефона..."></p>
                         <p class="personal-data">
-                            <input type="checkbox" required id="card_check"><label for="card_check">Я согласен на обработку
+                            <input type="checkbox" id="card_check"><label for="card_check">Я согласен на обработку
                         персональных данных</label>
                         </p>
                         <p class="submit">
@@ -394,7 +394,7 @@
                             <div class="call">
                                 <p>Единый телефон</p>
                                 <p class="tel">+7 (800) 555-64-47</p>
-                                <p class="input-text"><input type="tel" name="phone" id="callback_footer_form-phone" required="" placeholder="Ваш номер телефона..."></p>
+                                <p class="input-text"><input type="tel" name="phone" id="callback_footer_form-phone" placeholder="Ваш номер телефона..."></p>
 
                                 <button class="btn callback-btn" type="submit" data-popup="#callback_form">Перезвоните мне
                             </button>
@@ -441,10 +441,10 @@
                     <h4>Обратный звонок</h4>
                     <input type="hidden" name="form_name" value=" Обратный звонок">
                     <!--  <input type="hidden" name="club" value="<?=$_GET['club-name']?>"> -->
-                    <p class="input-text"><input name="name" type="text" required placeholder="Ваше имя..."></p>
-                    <p class="input-text"><input type="tel" name="phone" id="callback_form1-phone" required placeholder="Ваш номер телефона..."></p>
+                    <p class="input-text"><input name="name" type="text" placeholder="Ваше имя..."></p>
+                    <p class="input-text"><input type="tel" name="phone" id="callback_form1-phone" placeholder="Ваш номер телефона..."></p>
                     <p class="personal-data">
-                        <input type="checkbox" required id="check"><label for="check">Я согласен на обработку <br>персональных
+                        <input type="checkbox" id="check"><label for="check">Я согласен на обработку <br>персональных
                     данных</label>
 
                     </p>
@@ -465,10 +465,10 @@
                 <form name="free-visit-form" id="form2" action="#" method="post">
                     <h4>Записаться на визит</h4>
                     <input type="hidden" name="form_name" value=" Записаться на визит">
-                    <p class="input-text"><input name="name" type="text" required placeholder="Ваше имя..."></p>
-                    <p class="input-text"><input type="tel" name="phone" id="callback_form2-phone" required placeholder="Ваш номер телефона..."></p>
+                    <p class="input-text"><input name="name" type="text" placeholder="Ваше имя..."></p>
+                    <p class="input-text"><input type="tel" name="phone" id="callback_form2-phone" placeholder="Ваш номер телефона..."></p>
                     <p class="personal-data">
-                        <input type="checkbox" required id="check2"><label for="check2">Я согласен на обработку <br>персональных
+                        <input type="checkbox" id="check2"><label for="check2">Я согласен на обработку <br>персональных
                     данных</label>
 
                     </p>
@@ -487,7 +487,7 @@
             </div>
             <div class="form-content">
                 <h4>Спасибо!</h4>
-                <p>Ваша заявка отправлена. <br> Мы свяжемся с вами в ближайшее время.</p>
+                <p id="congratulations">Ваша заявка отправлена. <br> Мы свяжемся с вами в ближайшее время.</p>
                 <button class="btn close-btn">OK</button>
             </div>
         </div>
@@ -508,27 +508,6 @@
 
     </div>
     <script src="src/index.js"></script>
-    <!-- <script src="src/modules/carousel.js"></script>
-    <script>
-        const carousel = new SliderCarousel({
-            main: '#services>.wrapper',
-            wrap: '.services-slider',
-            slidesToShow: 5,
-            infinity: true,
-
-            responsive: [{
-                breakpoint: 1024,
-                slideToShow: 3
-            }, {
-                breakpoint: 768,
-                slideToShow: 2
-            }, {
-                breakpoint: 576,
-                slideToShow: 1
-            }]
-        });
-        carousel.init();
-    </script> -->
 </body>
 
 </html>

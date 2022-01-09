@@ -16,85 +16,176 @@ window.addEventListener('DOMContentLoaded', () => {
     };
     dropMenu();
 
-    // const modalWindows = () => {
-    //     const modalVisit = document.getElementById('free_visit_form'),
-    //         modalCallbackForm = document.getElementById('callback_form'),
-    //         modalGift = document.getElementById('gift'),
-    //         modalThanks = document.getElementById('thanks'),
+    class FuncAnimationOpacity {
+        constructor() {
+            this.count = 0;
+            this.getAnimation = '';
+            this.modal = '';
+        }
 
-    //         freeVisitBtn = document.querySelector('.free-visit'),
-    //         fixedGiftBtn = document.querySelector('.fixed-gift'),
-    //         callbackBtn = document.querySelectorAll('.callback-btn'),
-    //         cardOrderBtn = document.querySelector('.card-order-btn'),
+        animationOpacity() {
+            this.getAnimation = requestAnimationFrame(this.animationOpacity.bind(this));
+            this.count < 1 ? (
+                this.count += 0.05,
+                this.modal.style.opacity = `${this.count}`
+            ) : (
+                cancelAnimationFrame(this.getAnimation)
+            )
+        }
 
-    //         overlay = document.querySelectorAll('.overlay'),
-    //         buttonClose = document.querySelectorAll('.close_icon'),
-    //         btnCloseText = document.querySelectorAll('.close-btn');
+        animationMenu(modalWindow) {
+            this.modal = modalWindow;
+            (this.count === 0) ? (
+                requestAnimationFrame(this.animationOpacity.bind(this))
+            ) : (
+                cancelAnimationFrame(this.animationOpacity.bind(this)),
+                this.count = 0
+            )
+        };
+    }
+    const funcAnimationOpacity = new FuncAnimationOpacity();
 
-    //     const allModal = (modal, btnStart, background, btnClose, btnCloseTxt) => {
+    class ModalWindows {
+        constructor() {
+            this.modalVisit = document.getElementById('free_visit_form');
+            this.modalCallbackForm = document.getElementById('callback_form');
+            this.modalGift = document.getElementById('gift');
 
-    //         let count = 0,
-    //             getAnimation;
+            this.freeVisitBtn = document.querySelector('.free-visit');
+            this.fixedGiftBtn = document.querySelector('.fixed-gift');
+            this.callbackBtn = document.querySelectorAll('.callback-btn');
 
-    //         const animationOpacity = () => {
-    //             getAnimation = requestAnimationFrame(animationOpacity);
-    //             count < 1 ? (
-    //                 count += 0.05,
-    //                 modal.style.opacity = `${count}`
-    //             ) : (
-    //                 cancelAnimationFrame(getAnimation)
-    //             )
-    //         };
+            this.overlay = document.querySelectorAll('.overlay');
+            this.buttonClose = document.querySelectorAll('.close_icon');
+            this.btnCloseText = document.querySelectorAll('.close-btn');
+        }
 
-    //         const animationMenu = () => {
-    //             (count === 0) ? (
-    //                 requestAnimationFrame(animationOpacity)
-    //             ) : (
-    //                 cancelAnimationFrame(animationOpacity),
-    //                 count = 0
-    //             )
-    //         };
-    //         if (modal && btnStart) {
-    //             (btnStart === callbackBtn) ? (
-    //                 btnStart[0].addEventListener('click', () => {
-    //                     modal.style.display = 'block';
-    //                     animationMenu();
-    //                 }),
-    //                 btnStart[1].addEventListener('click', () => {
-    //                     modal.style.display = 'block';
-    //                     animationMenu();
-    //                 })
-    //             ) : (
-    //                 btnStart.addEventListener('click', () => {
-    //                     if (btnStart === fixedGiftBtn) btnStart.style.display = 'none';
-    //                     modal.style.display = 'block';
-    //                     animationMenu();
-    //                 })
-    //             )
+        allModal(modal, btnStart, background, btnClose, btnCloseTxt) {
+            if (modal && btnStart) {
+                (btnStart === this.callbackBtn) ? (
+                    btnStart[0].addEventListener('click', () => {
+                        modal.style.display = 'block';
+                        funcAnimationOpacity.animationMenu(modal);
+                    }),
+                    btnStart[1].addEventListener('click', () => {
+                        modal.style.display = 'block';
+                        funcAnimationOpacity.animationMenu(modal);
+                    })
+                ) : (
+                    btnStart.addEventListener('click', () => {
+                        if (btnStart === this.fixedGiftBtn) btnStart.style.display = 'none';
+                        modal.style.display = 'block';
+                        funcAnimationOpacity.animationMenu(modal);
+                    })
+                )
 
-    //             modal.style.opacity = '0';
-    //             modal.addEventListener('click', (event) => {
-    //                 event.preventDefault();
-    //                 const target = event.target;
-    //                 if (target === btnCloseTxt || target === background || target === btnClose) {
-    //                     modal.style.display = 'none';
-    //                     animationMenu();
-    //                     return;
-    //                 }
-    //             });
-    //         }
-    //     };
-    //     allModal(modalVisit, freeVisitBtn, overlay[1], buttonClose[1]);
+                modal.style.opacity = '0';
+                modal.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target === btnCloseTxt || target === background || target === btnClose) {
+                        modal.style.display = 'none';
+                        funcAnimationOpacity.animationMenu(modal);
+                        return;
+                    }
+                });
+            }
+        }
 
-    //     allModal(modalThanks, cardOrderBtn, overlay[2], buttonClose[2], btnCloseText[0]);
-    //     (fixedGiftBtn) ? (
-    //         allModal(modalCallbackForm, callbackBtn, overlay[0], buttonClose[0]),
-    //         allModal(modalGift, fixedGiftBtn, overlay[3], buttonClose[3], btnCloseText[1])
-    //     ) : (
-    //         allModal(modalCallbackForm, callbackBtn, overlay[0], buttonClose[0])
-    //     )
-    // };
-    // modalWindows();
+        initWindow() {
+            this.allModal(this.modalVisit, this.freeVisitBtn, this.overlay[1], this.buttonClose[1]);
+            (this.fixedGiftBtn) ? (
+                this.allModal(this.modalCallbackForm, this.callbackBtn, this.overlay[0], this.buttonClose[0]),
+                this.allModal(this.modalGift, this.fixedGiftBtn, this.overlay[3], this.buttonClose[3], this.btnCloseText[1])
+            ) : (
+                this.allModal(this.modalCallbackForm, this.callbackBtn, this.overlay[0], this.buttonClose[0])
+            )
+        }
+    };
+    const modalWindows = new ModalWindows();
+    modalWindows.initWindow();
+
+    const sendAjax = () => {
+        const clickMessage = 'Вы не заполнили все поля или не нажали галочку.',
+            loadMessage = 'Загрузка данных.',
+            errorMessage = 'Ошибка отправки...';
+        const modalThanks = document.getElementById('thanks'),
+            overlay = document.querySelectorAll('.overlay')[2],
+            btnCloseText = document.querySelectorAll('.close-btn')[0],
+            btnClose = document.querySelectorAll('.close_icon')[2],
+            modalThanksTxt = document.getElementById('congratulations');
+
+        const forms = [...document.forms];
+
+        const statusMessage = document.createElement('div');
+        statusMessage.classList.add('message-form');
+        statusMessage.style.cssText = `font-size: 2rem;`;
+
+        forms.forEach(item => {
+            item.addEventListener('submit', (event) => {
+                const target = event.target;
+                event.preventDefault();
+                if (!target.matches('#footer_form')) {
+                    for (let i = 0; i < [...item.getElementsByTagName('input')].length - 1; i++) {
+                        if ([...item.getElementsByTagName('input')][i].value === '') {
+                            item.appendChild(statusMessage);
+                            statusMessage.textContent = clickMessage;
+                            break;
+                        } //доделать валидацию
+                    }
+                    if ([...item.getElementsByTagName('input')][item.getElementsByTagName('input').length - 1].checked) {
+                        item.appendChild(statusMessage);
+                        const formData = new FormData(item);
+                        let body = {};
+                        formData.forEach((val, key) => {
+                            body[key] = val;
+                        });
+                        statusMessage.textContent = loadMessage;
+                        postData(body)
+                            .then((response) => {
+                                if (response.status !== 200) {
+                                    throw new Error('status network not 200');
+                                }
+                                statusMessage.textContent = '';
+                                modalThanks.style.display = 'block';
+                                funcAnimationOpacity.animationMenu(modalThanks);
+
+                                btnCloseText.addEventListener('click', () => { modalThanks.style.display = 'none' });
+                                overlay.addEventListener('click', () => { modalThanks.style.display = 'none' });
+                                btnClose.addEventListener('click', () => { modalThanks.style.display = 'none' });
+
+                                document.getElementById('free_visit_form').style.display = 'none';
+                                document.getElementById('callback_form').style.display = 'none';
+
+                                for (let i = 0; i < item.length; i++) {
+                                    if (item[i].tagName.toLowerCase() !== 'button') {
+                                        item[i].value = '';
+                                    }
+                                }
+                                document.getElementById('callback_footer_form-phone').value = '';
+                            })
+                            .catch((error) => {
+                                modalThanksTxt.textContent = errorMessage;
+                                console.error(error);
+                            });
+                    } else {
+                        item.appendChild(statusMessage);
+                        statusMessage.textContent = clickMessage;
+                    }
+                }
+            });
+        });
+
+        const postData = (body) => {
+            return fetch('./server.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/JSON'
+                },
+                body: JSON.stringify(body)
+            });
+        };
+    };
+    sendAjax();
 
     const burgerMenu = () => {
         const menuPanel = document.querySelector('.hidden-large'),
@@ -238,13 +329,6 @@ window.addEventListener('DOMContentLoaded', () => {
                         item.getElementsByTagName('input').name.value.replace(/[0-9]/g, '');
                 });
             }
-            // if (item.getElementsByTagName('p')) {
-            //     [...item.getElementsByTagName('p')].forEach(item => {
-            //         if (item.matches('.personal-data')) {
-            //             [...item.getElementsByTagName('input')]
-            //         } //доделать обязательный клик для галочки
-            //     });
-            // }
         });
     };
     validation();
@@ -331,63 +415,6 @@ window.addEventListener('DOMContentLoaded', () => {
     };
     const calc = new Calc();
     calc.calculate();
-
-    const sendAjax = () => {
-        const errorMessage = 'Что-то пошло не так..',
-            loadMessage = 'Загрузка..',
-            successMessage = 'Спасибо, мы скоро с вами свяжемся!';
-
-        const forms = [...document.forms];
-
-        const statusMessage = document.createElement('div');
-        statusMessage.classList.add('message-form');
-        statusMessage.style.cssText = `font-size: 2rem;`;
-
-        forms.forEach(item => {
-            item.addEventListener('submit', (event) => {
-                event.preventDefault();
-                if ([...item.querySelector('.personal-data').getElementsByTagName('input')].checked) {
-                    item.appendChild(statusMessage);
-                    const formData = new FormData(item);
-                    let body = {};
-                    formData.forEach((val, key) => {
-                        body[key] = val;
-                    });
-                    statusMessage.textContent = loadMessage;
-
-                    postData(body)
-                        .then((response) => {
-                            if (response.status !== 200) {
-                                throw new Error('status network not 200');
-                            }
-                            statusMessage.textContent = successMessage;
-                            for (let i = 0; i < item.length; i++) {
-                                if (item[i].tagName.toLowerCase() !== 'button') {
-                                    item[i].value = '';
-                                }
-                            }
-                        })
-                        .catch((error) => {
-                            opacityListener(errorMessage);
-                            console.error(error);
-                        });
-                } else {
-                    alert('error'); //отправка только после подтверждения доделать
-                }
-            });
-        });
-
-        const postData = (body) => {
-            return fetch('./server.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/JSON'
-                },
-                body: JSON.stringify(body)
-            });
-        };
-    };
-    sendAjax();
 
     class Slider {
         constructor() {
