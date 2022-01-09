@@ -16,220 +16,6 @@ window.addEventListener('DOMContentLoaded', () => {
     };
     dropMenu();
 
-    class FuncAnimationOpacity {
-        constructor() {
-            this.count = 0;
-            this.getAnimation = '';
-            this.modal = '';
-        }
-
-        animationOpacity() {
-            this.getAnimation = requestAnimationFrame(this.animationOpacity.bind(this));
-            this.count < 1 ? (
-                this.count += 0.05,
-                this.modal.style.opacity = `${this.count}`
-            ) : (
-                cancelAnimationFrame(this.getAnimation)
-            )
-        }
-
-        animationMenu(modalWindow) {
-            this.modal = modalWindow;
-            (this.count === 0) ? (
-                requestAnimationFrame(this.animationOpacity.bind(this))
-            ) : (
-                cancelAnimationFrame(this.animationOpacity.bind(this)),
-                this.count = 0
-            )
-        };
-    }
-    const funcAnimationOpacity = new FuncAnimationOpacity();
-
-    class ModalWindows {
-        constructor() {
-            this.modalVisit = document.getElementById('free_visit_form');
-            this.modalCallbackForm = document.getElementById('callback_form');
-            this.modalGift = document.getElementById('gift');
-
-            this.freeVisitBtn = document.querySelector('.free-visit');
-            this.fixedGiftBtn = document.querySelector('.fixed-gift');
-            this.callbackBtn = document.querySelectorAll('.callback-btn');
-
-            this.overlay = document.querySelectorAll('.overlay');
-            this.buttonClose = document.querySelectorAll('.close_icon');
-            this.btnCloseText = document.querySelectorAll('.close-btn');
-        }
-
-        allModal(modal, btnStart, background, btnClose, btnCloseTxt) {
-            if (modal && btnStart) {
-                (btnStart === this.callbackBtn) ? (
-                    btnStart[0].addEventListener('click', () => {
-                        modal.style.display = 'block';
-                        funcAnimationOpacity.animationMenu(modal);
-                    }),
-                    btnStart[1].addEventListener('click', () => {
-                        modal.style.display = 'block';
-                        funcAnimationOpacity.animationMenu(modal);
-                    })
-                ) : (
-                    btnStart.addEventListener('click', () => {
-                        if (btnStart === this.fixedGiftBtn) btnStart.style.display = 'none';
-                        modal.style.display = 'block';
-                        funcAnimationOpacity.animationMenu(modal);
-                    })
-                )
-
-                modal.style.opacity = '0';
-                modal.addEventListener('click', (event) => {
-                    const target = event.target;
-                    if (target === btnCloseTxt || target === background || target === btnClose) {
-                        modal.style.display = 'none';
-                        funcAnimationOpacity.animationMenu(modal);
-                        return;
-                    }
-                });
-            }
-        }
-
-        initWindow() {
-            this.allModal(this.modalVisit, this.freeVisitBtn, this.overlay[1], this.buttonClose[1]);
-            (this.fixedGiftBtn) ? (
-                this.allModal(this.modalCallbackForm, this.callbackBtn, this.overlay[0], this.buttonClose[0]),
-                this.allModal(this.modalGift, this.fixedGiftBtn, this.overlay[3], this.buttonClose[3], this.btnCloseText[1])
-            ) : (
-                this.allModal(this.modalCallbackForm, this.callbackBtn, this.overlay[0], this.buttonClose[0])
-            )
-        }
-    };
-    const modalWindows = new ModalWindows();
-    modalWindows.initWindow();
-
-    const sendAjax = () => {
-        const clickMessage = 'Вы не заполнили все поля или не нажали галочку.',
-            loadMessage = 'Загрузка данных.',
-            errorMessage = 'Ошибка отправки...';
-        const modalThanks = document.getElementById('thanks'),
-            overlay = document.querySelectorAll('.overlay')[2],
-            btnCloseText = document.querySelectorAll('.close-btn')[0],
-            btnClose = document.querySelectorAll('.close_icon')[2],
-            modalThanksTxt = document.getElementById('congratulations');
-
-        const forms = [...document.forms];
-
-        const statusMessage = document.createElement('div');
-        statusMessage.classList.add('message-form');
-        statusMessage.style.cssText = `font-size: 2rem;`;
-
-        forms.forEach(item => {
-            item.addEventListener('submit', (event) => {
-                const target = event.target;
-                event.preventDefault();
-                if (!target.matches('#footer_form')) {
-                    for (let i = 0; i < [...item.getElementsByTagName('input')].length - 1; i++) {
-                        if ([...item.getElementsByTagName('input')][i].value === '') {
-                            item.appendChild(statusMessage);
-                            statusMessage.textContent = clickMessage;
-                            break;
-                        } //доделать валидацию
-                    }
-                    if ([...item.getElementsByTagName('input')][item.getElementsByTagName('input').length - 1].checked) {
-                        item.appendChild(statusMessage);
-                        const formData = new FormData(item);
-                        let body = {};
-                        formData.forEach((val, key) => {
-                            body[key] = val;
-                        });
-                        statusMessage.textContent = loadMessage;
-                        postData(body)
-                            .then((response) => {
-                                if (response.status !== 200) {
-                                    throw new Error('status network not 200');
-                                }
-                                statusMessage.textContent = '';
-                                modalThanks.style.display = 'block';
-                                funcAnimationOpacity.animationMenu(modalThanks);
-
-                                btnCloseText.addEventListener('click', () => { modalThanks.style.display = 'none' });
-                                overlay.addEventListener('click', () => { modalThanks.style.display = 'none' });
-                                btnClose.addEventListener('click', () => { modalThanks.style.display = 'none' });
-
-                                document.getElementById('free_visit_form').style.display = 'none';
-                                document.getElementById('callback_form').style.display = 'none';
-
-                                for (let i = 0; i < item.length; i++) {
-                                    if (item[i].tagName.toLowerCase() !== 'button') {
-                                        item[i].value = '';
-                                    }
-                                }
-                                document.getElementById('callback_footer_form-phone').value = '';
-                            })
-                            .catch((error) => {
-                                modalThanksTxt.textContent = errorMessage;
-                                console.error(error);
-                            });
-                    } else {
-                        item.appendChild(statusMessage);
-                        statusMessage.textContent = clickMessage;
-                    }
-                }
-            });
-        });
-
-        const postData = (body) => {
-            return fetch('./server.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/JSON'
-                },
-                body: JSON.stringify(body)
-            });
-        };
-    };
-    sendAjax();
-
-    const burgerMenu = () => {
-        const menuPanel = document.querySelector('.hidden-large'),
-            menu = document.querySelector('.hidden-small'),
-            mainMenu = document.querySelector('.top-menu'),
-            fixedGiftAdapt = document.querySelector('.fixed-gift'),
-            PopUpMenu = document.querySelector('.popup-menu'),
-            closePopUpMenuBtn = document.querySelector('.close-menu-btn');
-
-        (document.documentElement.clientWidth < 768) ? (
-            menuPanel.style.display = 'block',
-            menu.style.display = 'none',
-            window.addEventListener('scroll', () => {
-                if (window.pageYOffset > mainMenu.getBoundingClientRect().top + 185) {
-                    mainMenu.style.position = 'fixed';
-                    if (fixedGiftAdapt) {
-                        fixedGiftAdapt.style.left = '15px';
-                        fixedGiftAdapt.style.right = 'auto';
-                    }
-                } else {
-                    mainMenu.style.position = 'static';
-                    if (fixedGiftAdapt) {
-                        fixedGiftAdapt.style.right = '15px';
-                        fixedGiftAdapt.style.left = 'auto';
-                    }
-                }
-            }),
-            menuPanel.lastElementChild.addEventListener('click', () => {
-                PopUpMenu.style.display = 'flex';
-            }),
-            PopUpMenu.addEventListener('click', (event) => {
-                const target = event.target;
-                if (target === closePopUpMenuBtn.lastElementChild || target === PopUpMenu || target.closest('a, li, ul')) {
-                    PopUpMenu.style.display = 'none';
-                    return;
-                }
-            })
-        ) : (
-            menuPanel.style.display = 'none',
-            menu.style.display = 'flex'
-        )
-    };
-    burgerMenu();
-
     const scrollArrow = () => {
         const arrowTop = document.getElementById('totop');
 
@@ -243,45 +29,6 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     };
     scrollArrow();
-
-    const sliderAutoScroll = () => {
-        const slider = document.querySelector('.head-slider>.wrapper>.main-slider');
-
-        let currentSlide = 0,
-            interval;
-
-        const prevSlide = (elem, index) => {
-            elem.children[index].style.display = 'none';
-        };
-        const nextSlide = (elem, index) => {
-            elem.children[index].style.display = 'flex';
-        };
-
-        const autoPlaySlider = () => {
-            prevSlide(slider, currentSlide);
-            currentSlide++;
-            if (currentSlide >= slider.childElementCount) {
-                currentSlide = 0;
-            }
-            nextSlide(slider, currentSlide);
-        };
-
-        const startSlide = (time = 2000) => {
-            interval = setInterval(autoPlaySlider, time);
-        };
-
-        const stopSlide = () => {
-            clearInterval(interval);
-        };
-        slider.addEventListener('mouseover', () => {
-            stopSlide();
-        });
-        slider.addEventListener('mouseout', () => {
-            startSlide();
-        });
-        startSlide();
-    };
-    sliderAutoScroll();
 
     const maskPhone = (selector, masked = '+7 (___) ___-__-__') => {
         const elem = selector;
@@ -333,6 +80,265 @@ window.addEventListener('DOMContentLoaded', () => {
     };
     validation();
 
+    const burgerMenu = () => {
+        const menuPanel = document.querySelector('.hidden-large'),
+            menu = document.querySelector('.hidden-small'),
+            mainMenu = document.querySelector('.top-menu'),
+            fixedGiftAdapt = document.querySelector('.fixed-gift'),
+            PopUpMenu = document.querySelector('.popup-menu'),
+            closePopUpMenuBtn = document.querySelector('.close-menu-btn');
+
+        const checkPosition = (pos, fixpanel) => {
+            mainMenu.style.position = pos;
+            if (fixpanel) {
+                fixpanel.style.left = '15px';
+                fixpanel.style.right = 'auto';
+            }
+        };
+
+        (document.documentElement.clientWidth < 768) ? (
+            menuPanel.style.display = 'block',
+            menu.style.display = 'none',
+            window.addEventListener('scroll', () => {
+                (window.pageYOffset > mainMenu.getBoundingClientRect().top + 185) ?
+                checkPosition('fixed', fixedGiftAdapt): checkPosition('static', fixedGiftAdapt);
+            }),
+            menuPanel.lastElementChild.addEventListener('click', () => {
+                PopUpMenu.style.display = 'flex';
+            }),
+            PopUpMenu.addEventListener('click', (event) => {
+                const target = event.target;
+                if (target === closePopUpMenuBtn.lastElementChild || target === PopUpMenu || target.closest('a, li, ul')) {
+                    PopUpMenu.style.display = 'none';
+                    return;
+                }
+            })
+        ) : (
+            menuPanel.style.display = 'none',
+            menu.style.display = 'flex'
+        )
+    };
+    burgerMenu();
+
+    class FuncAnimationOpacity {
+        constructor() {
+            this.count = 0;
+            this.getAnimation = '';
+            this.modal = '';
+        }
+
+        animationOpacity() {
+            this.getAnimation = requestAnimationFrame(this.animationOpacity.bind(this));
+            this.count < 1 ? (
+                this.count += 0.05,
+                this.modal.style.opacity = `${this.count}`
+            ) : (
+                cancelAnimationFrame(this.getAnimation)
+            )
+        }
+
+        animationMenu(modalWindow) {
+            this.modal = modalWindow;
+            this.count = 0;
+            (this.count === 0) ? (
+                requestAnimationFrame(this.animationOpacity.bind(this))
+            ) : (
+                cancelAnimationFrame(this.animationOpacity.bind(this)),
+                this.count = 0
+            )
+        };
+    }
+    const funcAnimationOpacity = new FuncAnimationOpacity();
+
+    class ModalWindows {
+        constructor() {
+            this.modalVisit = document.getElementById('free_visit_form');
+            this.modalCallbackForm = document.getElementById('callback_form');
+            this.modalGift = document.getElementById('gift');
+
+            this.freeVisitBtn = document.querySelector('.free-visit');
+            this.fixedGiftBtn = document.querySelector('.fixed-gift');
+            this.callbackBtn = document.querySelectorAll('.callback-btn');
+
+            this.overlay = document.querySelectorAll('.overlay');
+            this.buttonClose = document.querySelectorAll('.close_icon');
+            this.btnCloseText = document.querySelectorAll('.close-btn');
+        }
+
+        addListener(btnStart, modalWindow) {
+            btnStart.addEventListener('click', () => {
+                if (btnStart === this.fixedGiftBtn) btnStart.style.display = 'none';
+                modalWindow.style.display = 'block';
+                funcAnimationOpacity.animationMenu(modalWindow);
+            });
+        }
+
+        allModal(modal, btnStart, background, btnClose, btnCloseTxt) {
+            if (modal && btnStart) {
+                (btnStart === this.callbackBtn) ? (
+                    this.addListener(btnStart[0], modal)
+                ) : (
+                    this.addListener(btnStart, modal)
+                )
+
+                modal.style.opacity = '0';
+                modal.addEventListener('click', (event) => {
+                    const target = event.target;
+                    if (target === btnCloseTxt || target === background || target === btnClose) {
+                        modal.style.display = 'none';
+                        funcAnimationOpacity.animationMenu(modal);
+                        return;
+                    }
+                });
+            }
+        }
+
+        initWindow() {
+            this.allModal(this.modalVisit, this.freeVisitBtn, this.overlay[1], this.buttonClose[1]);
+            (this.fixedGiftBtn) ? (
+                this.allModal(this.modalCallbackForm, this.callbackBtn, this.overlay[0], this.buttonClose[0]),
+                this.allModal(this.modalGift, this.fixedGiftBtn, this.overlay[3], this.buttonClose[3], this.btnCloseText[1])
+            ) : (
+                this.allModal(this.modalCallbackForm, this.callbackBtn, this.overlay[0], this.buttonClose[0])
+            )
+        }
+    };
+    const modalWindows = new ModalWindows();
+    modalWindows.initWindow();
+
+    class SendForm {
+        constructor() {
+            this.clickMessage = 'Вы не заполнили все поля или не нажали на галочку.';
+            this.loadMessage = 'Загрузка данных.';
+            this.errorMessage = 'Ошибка отправки...';
+            this.lateTitle = 'Подождите.';
+            this.errorTitle = 'Предупреждение!';
+            this.congratulationTitle = 'Спасибо';
+            this.congratulation = 'Ваша заявка отправлена.';
+            this.modalThanks = document.getElementById('thanks');
+            this.modalThanksTxt = document.getElementById('congratulations');
+            this.title = document.getElementById('message-form');
+            this.forms = [...document.forms];
+        }
+
+        createModal(message, title) {
+            this.modalThanks.style.display = 'block';
+            funcAnimationOpacity.animationMenu(this.modalThanks);
+            this.modalThanks.addEventListener('click', (event) => {
+                const target = event.target;
+                if (!target.matches('.close-btn, .overlay, .close_icon')) return;
+                this.modalThanks.style.display = 'none';
+            });
+
+            this.title.textContent = message;
+            this.modalThanksTxt.textContent = title;
+        }
+
+        postDataProcessing(body, item) {
+            return this.postData(body, item)
+                .then((response) => {
+                    if (response.status !== 200) {
+                        throw new Error('status network not 200');
+                    }
+
+                    this.createModal(this.congratulationTitle, this.congratulation);
+                    document.getElementById('free_visit_form').style.display = 'none';
+                    document.getElementById('callback_form').style.display = 'none';
+                    if ([...item.getElementsByTagName('input')][item.getElementsByTagName('input').length - 1].checked) {
+                        [...item.getElementsByTagName('input')][item.getElementsByTagName('input').length - 1].checked = false;
+                    }
+                    for (let i = 0; i < item.length; i++) {
+                        if (item[i].tagName.toLowerCase() !== 'button') {
+                            item[i].value = '';
+                        }
+                    }
+                    document.getElementById('callback_footer_form-phone').value = '';
+                })
+                .catch((error) => {
+                    this.createModal(this.errorTitle, this.errorMessage);
+                    console.error(error);
+                });
+        }
+
+        postData(body) {
+            return fetch('./server.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/JSON'
+                },
+                body: JSON.stringify(body)
+            })
+        }
+
+        validationSend() {
+            this.forms.forEach(item => {
+                item.addEventListener('submit', (event) => {
+                    const target = event.target;
+                    event.preventDefault();
+                    if (target.matches('#footer_form') && (document.getElementById('footer_leto_mozaika').checked ||
+                            document.getElementById('footer_leto_schelkovo').checked)) {
+                        this.pushJSON(item);
+                    } else if ([...item.getElementsByTagName('input')][item.getElementsByTagName('input').length - 1].checked) {
+                        for (let i = 0; i < [...item.getElementsByTagName('input')].length - 1; i++) {
+                            if ([...item.getElementsByTagName('input')][i].value === '') {
+                                this.createModal(this.errorTitle, this.clickMessage);
+                                return;
+                            }
+                        }
+                        this.pushJSON(item);
+                    } else {
+                        this.createModal(this.errorTitle, this.clickMessage);
+                    }
+                });
+            });
+        }
+
+        pushJSON(item) {
+            const formData = new FormData(item);
+            let body = {};
+            formData.forEach((val, key) => {
+                body[key] = val;
+                if (item === document.getElementById('card_order')) {
+                    if (!document.getElementById('schelkovo') && !document.getElementById('mozaika')) {
+                        body['price'] = document.getElementById('price-total').textContent;
+                    }
+                }
+            });
+            this.createModal(this.lateTitle, this.loadMessage);
+            this.postDataProcessing(body, item);
+        }
+
+    };
+    const sendForm = new SendForm();
+    sendForm.validationSend();
+
+    class SliderAutoScroll {
+        constructor() {
+            this.slider = document.querySelector('.head-slider>.wrapper>.main-slider');
+            this.currentSlide = 0,
+                this.interval = '';
+        }
+
+        controlSlide(elem, index, stl) {
+            elem.children[index].style.display = stl;
+        }
+
+        autoPlaySlider() {
+            this.controlSlide(this.slider, this.currentSlide, 'none');
+            this.currentSlide++;
+            if (this.currentSlide >= this.slider.childElementCount) {
+                this.currentSlide = 0;
+            }
+            this.controlSlide(this.slider, this.currentSlide, 'flex');
+        };
+
+        startSlide(time = 2000) {
+            this.interval = setInterval(this.autoPlaySlider.bind(this), time);
+        }
+    };
+    const sliderAutoScroll = new SliderAutoScroll();
+    sliderAutoScroll.startSlide();
+
     class Calc {
         constructor() {
             if (document.querySelector('#card_order>.time')) {
@@ -358,6 +364,17 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        promocodeChoice(priceChoice) {
+            this.promocode.value === 'ТЕЛО2019' || this.promocode.value === 'тело2019' ?
+                this.result = Math.floor(priceChoice[this.index] * 0.7) :
+                this.result = priceChoice[this.index];
+        }
+
+        cardChoice(index) {
+            document.querySelector('#mozaika') ? this.result = this.priceMozaika[index] :
+                this.result = this.priceShelkovo[index];
+        }
+
         calculate() {
             if (document.querySelector('#mozaika')) this.result = this.priceMozaika[0];
             else if (document.querySelector('#schelkovo')) this.result = this.priceShelkovo[0];
@@ -381,13 +398,9 @@ window.addEventListener('DOMContentLoaded', () => {
                     this.analizChecked(this.time);
 
                     if (this.club[0].firstElementChild.checked) {
-                        this.promocode.value === 'ТЕЛО2019' || this.promocode.value === 'тело2019' ?
-                            this.result = Math.floor(this.priceMozaika[this.index] * 0.7) :
-                            this.result = this.priceMozaika[this.index];
+                        this.promocodeChoice(this.priceMozaika);
                     } else if (this.club[1].firstElementChild.checked) {
-                        this.promocode.value === 'ТЕЛО2019' || this.promocode.value === 'тело2019' ?
-                            this.result = Math.floor(this.priceShelkovo[this.index] * 0.7) :
-                            this.result = this.priceShelkovo[this.index];
+                        this.promocodeChoice(this.priceShelkovo);
                     }
                     this.priceTotal.textContent = this.result;
                 } else {
@@ -400,14 +413,11 @@ window.addEventListener('DOMContentLoaded', () => {
                     this.analizChecked(this.timeAnalog);
 
                     if (this.index === 3) {
-                        document.querySelector('#mozaika') ? this.result = this.priceMozaika[1] :
-                            this.result = this.priceShelkovo[1];
+                        this.cardChoice(1);
                     } else if (this.index === 4) {
-                        document.querySelector('#mozaika') ? this.result = this.priceMozaika[3] :
-                            this.result = this.priceShelkovo[3];
+                        this.cardChoice(3);
                     } else {
-                        document.querySelector('#mozaika') ? this.result = this.priceMozaika[this.index] :
-                            this.result = this.priceShelkovo[this.index];
+                        this.cardChoice(this.index);
                     }
                 }
             });
@@ -433,11 +443,7 @@ window.addEventListener('DOMContentLoaded', () => {
             this.nowSlide();
         }
 
-        nextSlide(elem, index, strName) {
-            elem.children[index].className = strName;
-        }
-
-        prevSlide(elem, index, strName) {
+        controlSlide(elem, index, strName) {
             elem.children[index].className = strName;
         }
 
@@ -552,14 +558,14 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         autoPlaySlider() {
-            this.prevSlide(this.slider, this.currentSlide, 'slide');
-            this.prevSlide(document.querySelector('.dots'), this.currentSlide, 'dot');
+            this.controlSlide(this.slider, this.currentSlide, 'slide');
+            this.controlSlide(document.querySelector('.dots'), this.currentSlide, 'dot');
             this.currentSlide++;
             if (this.currentSlide >= this.slider.childElementCount) {
                 this.currentSlide = 0;
             }
-            this.nextSlide(this.slider, this.currentSlide, 'slider-active');
-            this.nextSlide(document.querySelector('.dots'), this.currentSlide, 'dot-active');
+            this.controlSlide(this.slider, this.currentSlide, 'slider-active');
+            this.controlSlide(document.querySelector('.dots'), this.currentSlide, 'dot-active');
         };
 
         listenerMouse() {
@@ -614,8 +620,8 @@ window.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                this.prevSlide(this.slider, this.currentSlide, 'slide');
-                this.prevSlide(document.querySelector('.dots'), this.currentSlide, 'dot');
+                this.controlSlide(this.slider, this.currentSlide, 'slide');
+                this.controlSlide(document.querySelector('.dots'), this.currentSlide, 'dot');
 
                 if (target.matches('.slide-next-dot, .slide-next-dot>img')) {
                     this.currentSlide++;
@@ -636,8 +642,8 @@ window.addEventListener('DOMContentLoaded', () => {
                     this.currentSlide = this.slider.childElementCount - 1;
                 }
 
-                this.nextSlide(this.slider, this.currentSlide, 'slider-active');
-                this.nextSlide(document.querySelector('.dots'), this.currentSlide, 'dot-active');
+                this.controlSlide(this.slider, this.currentSlide, 'slider-active');
+                this.controlSlide(document.querySelector('.dots'), this.currentSlide, 'dot-active');
             })
         }
     }
@@ -746,21 +752,21 @@ window.addEventListener('DOMContentLoaded', () => {
             document.head.appendChild(style);
         }
 
-        prevSlider() {
-            if (this.position > 0) {
-                --this.position;
-                if (this.position < 0) {
-                    this.position = this.slider.childElementCount - this.slidesToShow;
+        nextSlide() {
+            if (this.position < this.slider.childElementCount - this.slidesToShow) {
+                ++this.position;
+                if (this.position > this.slider.childElementCount - this.slidesToShow) {
+                    this.position = 0;
                 }
                 this.slider.style.transform = `translateX(-${this.position * this.widthSlide}%)`;
             }
         }
 
-        nextSlider() {
-            if (this.position < this.slider.childElementCount - this.slidesToShow) {
-                ++this.position;
-                if (this.position > this.slider.childElementCount - this.slidesToShow) {
-                    this.position = 0;
+        prevSlide() {
+            if (this.position > 0) {
+                --this.position;
+                if (this.position < 0) {
+                    this.position = this.slider.childElementCount - this.slidesToShow;
                 }
                 this.slider.style.transform = `translateX(-${this.position * this.widthSlide}%)`;
             }
@@ -775,13 +781,22 @@ window.addEventListener('DOMContentLoaded', () => {
                 flex: 0 0 ${this.widthSlide}% !important
                 `;
             });
-            document.querySelector('#services .slide-next-dot').style.cssText = `
+            (window.innerWidth > 1000) ? (
+                document.querySelector('#services .slide-next-dot').style.cssText = `
                 left: ${(((window.innerWidth - this.wrapper.clientWidth) / 2 
                     + this.wrapper.clientWidth) - 30) * 100 / window.innerWidth}%;
-            `;
-            document.querySelector('#services .slide-prev-dot').style.cssText = `
+            `,
+                document.querySelector('#services .slide-prev-dot').style.cssText = `
                 left: ${((window.innerWidth - this.wrapper.clientWidth) / 2) * 100 / window.innerWidth}%;
-            `;
+            `
+            ) : (
+                document.querySelector('#services .slide-next-dot').style.cssText = `
+                left: ${(((window.innerWidth - this.wrapper.clientWidth) / 2 
+                    + this.wrapper.clientWidth) - 40) * 100 / window.innerWidth}%;
+            `, document.querySelector('#services .slide-prev-dot').style.cssText = `
+                left: ${(((window.innerWidth - this.wrapper.clientWidth) / 2) + 7) * 100 / window.innerWidth}%;
+            `
+            )
         }
 
         responseInit() {
@@ -812,11 +827,9 @@ window.addEventListener('DOMContentLoaded', () => {
             img.src = src;
             dot.insertAdjacentElement('beforeend', img);
             this.slider.insertAdjacentElement('beforebegin', dot);
-            (nameDot === 'slide-prev-dot') ? (
-                dot.addEventListener('click', this.prevSlider.bind(this))
-            ) : (
-                dot.addEventListener('click', this.nextSlider.bind(this))
-            )
+            (dot.matches('.slide-prev-dot')) ?
+            dot.addEventListener('click', this.prevSlide.bind(this)):
+                dot.addEventListener('click', this.nextSlide.bind(this));
         }
 
         addArrow() {
