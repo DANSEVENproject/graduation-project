@@ -15,16 +15,16 @@ class Calc {
     }
 
     analizChecked(elem) {
-        for (let i = 0; i < [...elem.getElementsByTagName('input')].length; i++) {
-            if ([...elem.getElementsByTagName('input')][i].checked) {
+        [...elem.getElementsByTagName('input')].forEach((item, i) => {
+            if (item.checked) {
                 this.index = i;
-                break;
+                return;
             }
-        }
+        })
     }
 
     promocodeChoice(priceChoice) {
-        this.promocode.value === 'ТЕЛО2019' || this.promocode.value === 'тело2019' ?
+        this.promocode.value.toLowerCase() === 'тело2019' ?
             this.result = Math.floor(priceChoice[this.index] * 0.7) :
             this.result = priceChoice[this.index];
     }
@@ -46,13 +46,8 @@ class Calc {
             const target = event.target;
 
             if (document.querySelector('#card_order>.time')) {
-                if (!target.matches('#card_leto_mozaika') &&
-                    !target.matches('#card_leto_schelkovo') &&
-                    !target.matches('.price-message__promo') &&
-                    !target.matches('#m1') &&
-                    !target.matches('#m2') &&
-                    !target.matches('#m3') &&
-                    !target.matches('#m4')) return;
+                if (!target.matches(`#card_leto_mozaika, #card_leto_schelkovo, 
+                .price-message__promo, #m1, #m2, #m3, #m4`)) return;
 
                 this.analizChecked(this.time);
 
@@ -63,11 +58,7 @@ class Calc {
                 }
                 this.priceTotal.textContent = this.result;
             } else {
-                if (!target.matches('#m1') &&
-                    !target.matches('#m2') &&
-                    !target.matches('#m3') &&
-                    !target.matches('#m4') &&
-                    !target.matches('#m5')) return;
+                if (!target.matches('#m1, #m2, #m3, #m4, #m5')) return;
 
                 this.analizChecked(this.timeAnalog);
 

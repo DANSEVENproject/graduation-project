@@ -45,12 +45,12 @@ class ModalWindows {
 
     initWindow() {
         this.allModal(this.modalVisit, this.freeVisitBtn, this.overlay[1], this.buttonClose[1]);
-        (this.fixedGiftBtn) ? (
+        if (this.fixedGiftBtn) {
             this.allModal(this.modalCallbackForm, this.callbackBtn, this.overlay[0], this.buttonClose[0]),
-            this.allModal(this.modalGift, this.fixedGiftBtn, this.overlay[3], this.buttonClose[3], this.btnCloseText[1])
-        ) : (
+                this.allModal(this.modalGift, this.fixedGiftBtn, this.overlay[3], this.buttonClose[3], this.btnCloseText[1])
+        } else {
             this.allModal(this.modalCallbackForm, this.callbackBtn, this.overlay[0], this.buttonClose[0])
-        )
+        }
     }
 };
 const modalWindows = new ModalWindows();

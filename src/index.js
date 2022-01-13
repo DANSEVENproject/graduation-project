@@ -27,4 +27,4 @@ sendForm.validationSend();
 sliderAutoScroll.startSlide();
 calc.calculate();
 slider.init();
-sliderCarousel.init();
+sliderCarousel.responseInit();

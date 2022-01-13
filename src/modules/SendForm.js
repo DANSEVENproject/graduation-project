@@ -41,11 +41,11 @@ class SendForm {
                 if ([...item.getElementsByTagName('input')][item.getElementsByTagName('input').length - 1].checked) {
                     [...item.getElementsByTagName('input')][item.getElementsByTagName('input').length - 1].checked = false;
                 }
-                for (let i = 0; i < item.length; i++) {
-                    if (item[i].tagName.toLowerCase() !== 'button') {
-                        item[i].value = '';
+                item.forEach(items => {
+                    if (items.tagName.toLowerCase() !== 'button') {
+                        items.value = '';
                     }
-                }
+                });
                 document.getElementById('callback_footer_form-phone').value = '';
             })
             .catch((error) => {
@@ -73,12 +73,13 @@ class SendForm {
                         document.getElementById('footer_leto_schelkovo').checked)) {
                     this.pushJSON(item);
                 } else if ([...item.getElementsByTagName('input')][item.getElementsByTagName('input').length - 1].checked) {
-                    for (let i = 0; i < [...item.getElementsByTagName('input')].length - 1; i++) {
-                        if ([...item.getElementsByTagName('input')][i].value === '') {
+                    ([...item.getElementsByTagName('input')]).forEach((items, i) => {
+                        if (i === [...item.getElementsByTagName('input')].length - 1) return;
+                        if (items.value === '') {
                             this.createModal(this.errorTitle, this.clickMessage);
                             return;
                         }
-                    }
+                    })
                     this.pushJSON(item);
                 } else {
                     this.createModal(this.errorTitle, this.clickMessage);

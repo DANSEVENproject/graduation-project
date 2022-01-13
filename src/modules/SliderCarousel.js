@@ -2,6 +2,11 @@ class SliderCarousel {
     constructor() {
         this.slider = document.querySelector('.services-slider');
         this.wrapper = document.querySelector('#services>.wrapper');
+        this.slide = document.querySelectorAll('#services .slide');
+        this.leftArrow = document.querySelector('#services .slide-prev-dot');
+        this.rightArrow = document.querySelector('#services .slide-next-dot');
+        this.prevSlide = this.prevSlide.bind(this);
+        this.nextSlide = this.nextSlide.bind(this);
         this.slidesToShow = 5;
         this.position = 0;
         this.widthSlide = Math.floor(100 / this.slidesToShow);
@@ -18,86 +23,6 @@ class SliderCarousel {
             breakpoint: 510,
             slideToShow: 1
         }];
-    }
-
-    init() {
-        this.addClass();
-        this.addStyle();
-        this.addArrow();
-        this.responseInit();
-    }
-
-    addClass() {
-        this.slider.classList.add('slider');
-        this.wrapper.classList.add('slider__wrap');
-        [...this.slider.children].forEach(item => {
-            item.classList.add('slider__item');
-        });
-    }
-
-    addStyle() {
-        const style = document.createElement('style');
-        style.classList.add('sliderCarousel');
-        style.textContent = `
-            .slider {
-                transition: transform 0.5s !important;
-                will-change: transform !important;
-                padding-left: 0px !important;
-                padding-right: 0px !important;
-            }
-            .slider__wrap {
-                overflow: hidden !important;                          
-                padding-left: 0px !important;
-                padding-right: 0px !important;
-            }
-            .slider__item {
-                display: flex !important;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                margin: auto 0 !important;
-            }
-
-            #services .slide-prev-dot{
-                position: absolute;
-                z-index: 1;
-                margin-left: -7px;
-                margin-top: 60px;
-                border-radius: 50%;
-                display: flex;
-                height: 40px;
-                width: 40px;
-                align-items: center;
-                justify-content: center;
-                background: #ffd11a;
-                border: none;
-            }
-            #services .slide-prev-dot img{
-                height: 17px;
-                width: 17px;
-                margin-right: 2px;
-            }
-            #services .slide-next-dot{
-                position: absolute;
-                border-radius: 50%;
-                z-index: 1;
-                margin-top: 60px;
-                display: flex;
-                height: 40px;
-                width: 40px;
-                align-items: center;
-                justify-content: center;
-                background: #ffd11a;
-                border: none;
-            }
-            #services .slide-next-dot img{
-                height: 17px;
-                width: 17px;
-                margin-left: 2px;
-                right: 0;
-            }
-        `;
-        document.head.appendChild(style);
     }
 
     nextSlide() {
@@ -123,25 +48,25 @@ class SliderCarousel {
     checkWidthWindow(slideCount) {
         this.slidesToShow = slideCount;
         this.widthSlide = Math.floor(100 / this.slidesToShow);
-        const sliderItem = document.querySelectorAll('.slider__item');
+        const sliderItem = this.slide;
         sliderItem.forEach(item => {
             item.style.cssText = `
             flex: 0 0 ${this.widthSlide}% !important
             `;
         });
         (window.innerWidth > 1000) ? (
-            document.querySelector('#services .slide-next-dot').style.cssText = `
+            this.rightArrow.style.cssText = `
             left: ${(((window.innerWidth - this.wrapper.clientWidth) / 2 
                 + this.wrapper.clientWidth) - 30) * 100 / window.innerWidth}%;
         `,
-            document.querySelector('#services .slide-prev-dot').style.cssText = `
+            this.leftArrow.style.cssText = `
             left: ${((window.innerWidth - this.wrapper.clientWidth) / 2) * 100 / window.innerWidth}%;
         `
         ) : (
-            document.querySelector('#services .slide-next-dot').style.cssText = `
+            this.rightArrow.style.cssText = `
             left: ${(((window.innerWidth - this.wrapper.clientWidth) / 2 
                 + this.wrapper.clientWidth) - 40) * 100 / window.innerWidth}%;
-        `, document.querySelector('#services .slide-prev-dot').style.cssText = `
+        `, this.leftArrow.style.cssText = `
             left: ${(((window.innerWidth - this.wrapper.clientWidth) / 2) + 7) * 100 / window.innerWidth}%;
         `
         )
@@ -166,23 +91,9 @@ class SliderCarousel {
         };
         checkResponse();
         window.addEventListener('resize', checkResponse);
-    }
 
-    createArrow(nameDot, src) {
-        const dot = document.createElement('button');
-        dot.classList.add(nameDot);
-        const img = document.createElement('img');
-        img.src = src;
-        dot.insertAdjacentElement('beforeend', img);
-        this.slider.insertAdjacentElement('beforebegin', dot);
-        (dot.matches('.slide-prev-dot')) ?
-        dot.addEventListener('click', this.prevSlide.bind(this)):
-            dot.addEventListener('click', this.nextSlide.bind(this));
-    }
-
-    addArrow() {
-        this.createArrow('slide-prev-dot', './images/arrow-left.svg');
-        this.createArrow('slide-next-dot', './images/arrow-right.svg');
+        this.leftArrow.addEventListener('click', this.prevSlide);
+        this.rightArrow.addEventListener('click', this.nextSlide);
     }
 };
 const sliderCarousel = new SliderCarousel();
